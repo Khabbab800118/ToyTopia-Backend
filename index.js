@@ -30,8 +30,15 @@ async function run() {
     // create user
     app.post("/users", async (req, res) => {
       const newUser = req.body;
-      const result = await userCollection.insertOne(newUser);
-      res.send(result);
+      const email = req.body.email;
+      const query = { email: email };
+      const existingUser = await userCollection.findOne(query);
+      if (existingUser) {
+        res.send({ message: "User Already Exists" });
+      } else {
+        const result = await userCollection.insertOne(newUser);
+        res.send(result);
+      }
     });
 
     // create
@@ -41,7 +48,20 @@ async function run() {
       res.send(result);
     });
 
-    // get all products
+    // get popular data
+    app.get("/popular-toys", async (req, res) => {
+      const cursor = toyCollection.find().sort({ rating: -1 }).limit(6);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+    // get slider data
+    app.get("/slider-toys", async (req, res) => {
+      const cursor = toyCollection.find().skip(10).limit(3);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    // get products by email or all products
     app.get("/toys", async (req, res) => {
       const email = req.query.email;
       let query = {};
