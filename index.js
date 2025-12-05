@@ -63,13 +63,14 @@ async function run() {
 
     // get products by email or all products
     app.get("/toys", async (req, res) => {
-      const email = req.query.email;
+      const sellerEmail = req.query.sellerEmail;
+
       let query = {};
-      if (email) {
-        query = { sellerEmail: email };
+      if (sellerEmail) {
+        query = { sellerEmail: sellerEmail };
       }
-      const cursor = toyCollection.find(query);
-      const result = await cursor.toArray();
+
+      const result = await toyCollection.find(query).toArray();
       res.send(result);
     });
 
